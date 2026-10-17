@@ -1,0 +1,111 @@
+{
+ "handle": "@qaf_of",
+ "slides": [
+  {
+   "type": "cover",
+   "logos": [
+    "claude",
+    "gmail",
+    "calendar"
+   ],
+   "title": "خل Claude يرتب\nإيميلك ومواعيدك",
+   "sub": "ثلاث خطوات وتصير عندك سكرتيرة تقرا بريدك وتنظم يومك"
+  },
+  {
+   "type": "rows",
+   "rows": [
+    {
+     "label": "الإيمـــيل",
+     "logos": [
+      "gmail"
+     ]
+    },
+    {
+     "label": "الكلنـــدر",
+     "logos": [
+      "apple-calendar",
+      "calendar"
+     ]
+    },
+    {
+     "label": "التنبيهات",
+     "logos": [
+      "reminders"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "steps",
+   "steps": [
+    {
+     "card": {
+      "type": "button",
+      "label": "New chat",
+      "avatar": "RA",
+      "avatar_highlight": true,
+      "skeleton": [
+       70,
+       52,
+       64
+      ]
+     },
+     "caption": "اضغط على أول حرفين من اسمك"
+    },
+    {
+     "card": {
+      "type": "menu",
+      "highlight": 2,
+      "items": [
+       {
+        "icon": "sliders-horizontal",
+        "label": "Capabilities"
+       },
+       {
+        "icon": "code-xml",
+        "label": "Claude Code"
+       },
+       {
+        "icon": "layout-grid",
+        "label": "Connectors"
+       },
+       {
+        "icon": "shield-check",
+        "label": "Permissions"
+       }
+      ]
+     },
+     "caption": "اختر خانة Connectors"
+    }
+   ]
+  },
+  {
+   "type": "prompt",
+   "title": "جرّب هالبرومت",
+   "prompt": "رتب لي أهم 5 إيميلات وصلتني اليوم، وحط لي موعد في التقويم لأي اجتماع مذكور فيها",
+   "caption": "انسخه كذا وعدّل اللي يناسبك"
+  },
+  {
+   "type": "news",
+   "n": 1,
+   "company": "Company",
+   "logos": [
+    "anthropic"
+   ],
+   "title": "عنوان الخبر هنا بسطرين بالكثير",
+   "body": "وصف الخبر بجملة أو جملتين، مع الأرقام اللي في المصدر.",
+   "why": "ليش يهم المتابع، بجملة وحدة.",
+   "source": "Source"
+  },
+  {
+   "type": "end",
+   "logos": [
+    "qaf"
+   ],
+   "title": "احفظ المنشور\nوجرّبها اليوم",
+   "sub": "كل يوم حيلة جديدة في الذكاء الاصطناعي",
+   "cta": "تبي الذكاء يشتغل لمشروعك؟",
+   "cta_sub": "مواقع، أتمتة، وربط أنظمة. راسلني على الخاص"
+  }
+ ]
+}

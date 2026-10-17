@@ -1,0 +1,4 @@
+node_modules/
+fonts/*.ttf
+out/
+__pycache__/
