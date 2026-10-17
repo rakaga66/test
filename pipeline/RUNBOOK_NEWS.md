@@ -89,6 +89,7 @@ python3 "$P/scripts/render.py" "$OUT/post.json" "$OUT"
 - الوقت: 22:00 اليوم. لو الساعة الحين بعد 21:40: بعد 20 دقيقة من الحين.
 - شروط النشر التلقائي (كلها): كل خبر وثوقه 85 أو أكثر (مصدر رسمي أو مصدرين) وما فيه إشاعة، المراجع ما ترك مشكلة ما انحلت، ما فيه OVERFLOW، فتحت الشرائح وهي سليمة، `ALL 200`. تمام: `autoPublish: true`. شرط ناقص: `autoPublish: false` واكتب أي شرط.
 - `createScheduledPost`: `providers: [{"network":"instagram"}]`، `instagramData: {"type":"POST"}`، `media` الروابط السبعة بالترتيب، `text` الكابشن، `publicationDate: {"dateTime":"<D>T22:00:00","timezone":"Asia/Riyadh"}`.
+- تيك توك: لو `networksData` في getBrandSettings فيها tiktok، أضف provider tiktok بنفس الصور ونفس المنشور، و`tiktokData: {"title": "<عنوان الخبر الأول>", "privacyOption": "PUBLIC_TO_EVERYONE", "autoAddMusic": true, "photoCoverIndex": 0}`. لو مو مربوط، تجاهله.
 - تأكد بـ`getScheduledPosts` وخذ `plannerUrl`. لا تعدّل ولا تحذف منشورات ثانية.
 
 ## 9) تعليم المنشور ورفع الذاكرة

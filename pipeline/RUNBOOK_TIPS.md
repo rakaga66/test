@@ -94,6 +94,7 @@ python3 "$P/scripts/render.py" "$OUT/post.json" "$OUT"
 - الوقت: 14:00 اليوم. لو الساعة الحين بعد 13:40: بعد 20 دقيقة من الحين.
 - شروط النشر التلقائي (كلها): المراجعة ما تركت مشكلة معلومة ما انحلت، ما فيه OVERFLOW، فتحت كل الشرائح وهي سليمة، `ALL 200`. كلها تمام: `autoPublish: true`. شرط ناقص: `autoPublish: false` (يجيه إشعار في تطبيق Metricool) واكتب أي شرط نقص.
 - `createScheduledPost`: `providers: [{"network":"instagram"}]`، `instagramData: {"type":"POST"}`، `media` الروابط بالترتيب، `text` الكابشن، `publicationDate: {"dateTime":"<D>T14:00:00","timezone":"Asia/Riyadh"}`.
+- تيك توك: لو `networksData` في getBrandSettings فيها tiktok، أضف provider tiktok بنفس الصور ونفس المنشور، و`tiktokData: {"title": "<عنوان الحيلة>", "privacyOption": "PUBLIC_TO_EVERYONE", "autoAddMusic": true, "photoCoverIndex": 0}`. لو مو مربوط، تجاهله.
 - تأكد بـ`getScheduledPosts` إنه انجدول، وخذ `plannerUrl`. لا تعدّل ولا تحذف منشورات ثانية.
 - لو الجدولة فشلت: `memory.py drop <key>` وقل السبب.
 
