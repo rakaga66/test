@@ -4,12 +4,19 @@
 اللغة: عربي سعودي بسيط ومباشر. بلا إيموجي، بلا شرطة طويلة (—).
 ما فيه أحد يتابعك وقت التشغيل: لا تسأل، قرّر ونفّذ، واكتب التقرير بالآخر.
 
+## المسارات (مهم)
+كل أمر Bash يبدأ من جديد: المجلد والمتغيرات ما تنحفظ بين الأوامر. استخدم المسارات الكاملة دائمًا، وابدأ كل أمر بـ:
+```bash
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-news"
+```
+- `$HOME/qaf-media` = نسخة المستودع العام rakaga66/test (الصور والأدوات). `$HOME/qaf-private` = المستودع الخاص (الخط). `$HOME/hojas-studio` = مستودع موقع راكان (ذاكرة الأخبار).
+
 ## 0) التجهيز
 ```bash
-cd "$HOME/qaf-media/pipeline" && bash scripts/setup.sh      # يحتاج نسخة rakaga66/qaf-private في $HOME/qaf-private
-D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-news"; mkdir -p "$OUT"
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-news"
+bash "$P/scripts/setup.sh" && mkdir -p "$OUT"
 ```
-اقرأ `SPEC.md` كامل.
+اقرأ `$P/SPEC.md` كامل.
 
 ## 1) ذاكرة الأخبار (قبل الاختيار)
 الذاكرة هي `site/data/news.json` في مستودع `rakaga66/hojas-studio` (نفس ملف صفحة الأخبار في موقعه).
@@ -40,14 +47,16 @@ python3 "$HOME/hojas-studio/site/news.py" seen 21
 ```
 - `title` 60 حرف بالكثير، `body` 150، `why` 110.
 - **كل خبر لازم يكون معه شعار الشركة** (أسماء الشعارات في SPEC.md). لو خبر يذكر شركتين، حط الاثنين.
+- حط مسافة بعد واو العطف قبل الكلمة الإنجليزية (`و OpenAI`). الأرقام إنجليزية (5 مو ٥).
 
 ## 4) الرسم والمراجعة
 ```bash
-python3 scripts/render.py "$OUT/post.json" "$OUT"
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-news"
+python3 "$P/scripts/render.py" "$OUT/post.json" "$OUT"
 ```
-- `OVERFLOW` اختصر وأعد. `MISSING-LOGO` صلّح الاسم وأعد.
-- افتح **كل** الشرائح بأداة Read: الحروف العربية سليمة، الشعار ظاهر وصحيح، ما فيه نص مقطوع.
-- مراجعة مستقلة: وكيل فرعي (Agent، general-purpose) تعطيه نص الأخبار وروابطها، يفتح كل مصدر ويتأكد من كل رقم وتاريخ واسم، ويتأكد إن الخبر فعلاً من آخر 36 ساعة، ويرجّع قائمة مشاكل فقط. صلّح وأعد الرسم.
+- `ERROR` عن الخط: شغّل setup.sh مرة ثانية. `OVERFLOW` اختصر وأعد. `MISSING-LOGO` صلّح الاسم وأعد.
+- افتح **كل** الشرائح (`$OUT/slide_NN.png`) بأداة Read: الحروف العربية سليمة، الشعار ظاهر وصحيح، ما فيه نص مقطوع ولا كلمة يتيمة بسطر.
+- مراجعة مستقلة: وكيل فرعي (Agent، general-purpose) تعطيه نص الأخبار وروابطها، يفتح كل مصدر ويتأكد من كل رقم وتاريخ واسم، ويتأكد إن الخبر فعلاً من آخر 36 ساعة، ويرجّع قائمة مشاكل فقط. لو أداة Agent مو موجودة: سوّها بنفسك بـWebFetch لكل مصدر، واكتب في التقرير إنك راجعت بنفسك. صلّح وأعد الرسم.
 
 ## 5) الكابشن `$OUT/caption.txt`
 ```
@@ -67,12 +76,12 @@ python3 scripts/render.py "$OUT/post.json" "$OUT"
 
 ## 6) تسجيل الأخبار في الذاكرة (قبل النشر)
 داخل `$HOME/hojas-studio`:
-- اكتب `news-today.json`: قائمة، لكل خبر: `key` (إنجليزي صغير بشرطات، مثل `anthropic-claude-haiku-5-5`)، `date` (YYYY-MM-DD)، `company`، `category` (نماذج، صور، فيديو، صوت، برمجة، بحث، أعمال، تنظيم، أمان)، `title` (عربي، 70 حرف بالكثير)، `summary` (عربي، 260 بالكثير)، `note` اختياري، `sources` (كل مصدر: `name` و`url` و`type` = official أو outlet أو social)، `rumor` لو تسريب، و`"posted": {}`.
+- اكتب `$HOME/hojas-studio/news-today.json`: قائمة، لكل خبر: `key` (إنجليزي صغير بشرطات، مثل `anthropic-claude-haiku-5-5`)، `date` (YYYY-MM-DD)، `company`، `category` (نماذج، صور، فيديو، صوت، برمجة، بحث، أعمال، تنظيم، أمان)، `title` (عربي، 70 حرف بالكثير)، `summary` (عربي، 260 بالكثير)، `note` اختياري، `sources` (كل مصدر: `name` و`url` و`type` = official أو outlet أو social)، `rumor` لو تسريب، و`"posted": {}`.
 - نسبة الوثوق لا تكتبها، السكربت يحسبها.
-- `python3 site/news.py add news-today.json`. أي خبر يطلع «موجود» معناه نزل قبل: استبدله، وعدّل post.json، وأعد الرسم قبل ما تكمل.
+- `cd "$HOME/hojas-studio" && python3 site/news.py add news-today.json`. أي خبر يطلع «موجود» معناه نزل قبل: استبدله، وعدّل post.json، وأعد الرسم قبل ما تكمل.
 
 ## 7) الاستضافة
-`bash scripts/host.sh "$OUT" "$D-news"` لازم آخر سطر `ALL 200`. لو الرفع فشل: لا تحاول بطريقة ثانية، لا تجدول، وقل إن الصور جاهزة للرفع اليدوي.
+`bash "$HOME/qaf-media/pipeline/scripts/host.sh" "$OUT" "$D-news"` (عرّف D و OUT بنفس الأمر). لازم آخر سطر `ALL 200`. لو الرفع فشل: لا تحاول بطريقة ثانية، لا تجدول، وقل إن الصور جاهزة للرفع اليدوي.
 
 ## 8) الجدولة في Metricool
 - `getBrandSettings`: الحساب qaf_of (blogId 7411778، Asia/Riyadh).
@@ -83,8 +92,8 @@ python3 scripts/render.py "$OUT/post.json" "$OUT"
 - تأكد بـ`getScheduledPosts` وخذ `plannerUrl`. لا تعدّل ولا تحذف منشورات ثانية.
 
 ## 9) تعليم المنشور ورفع الذاكرة
-- لكل خبر انجدول: `python3 site/news.py posted <key> instagram`. لو ما انجدل شي، لا تعلّم شي.
-- `python3 site/build.py` ولازم يطلع «الموقع جاهز».
+- لكل خبر انجدول: `cd "$HOME/hojas-studio" && python3 site/news.py posted <key> instagram`. لو ما انجدل شي، لا تعلّم شي.
+- `cd "$HOME/hojas-studio" && python3 site/build.py` ولازم يطلع «الموقع جاهز».
 - commit فيه `site/data/news.json` بس، برسالة «News: YYYY-MM-DD»، وادفعه على main (Netlify ينشر لحاله). لو الدفع فشل: لا تحاول بطريقة ثانية، أرسل الملف لراكان وقل إن الذاكرة ما انحفظت.
 
 ## 10) التقرير (آخر رسالة)

@@ -2,8 +2,10 @@
 """Memory of the noon tips posts, so nothing is posted twice. File: pipeline/data/tips.json
 
   python3 scripts/memory.py seen [N]        last N tips (default 90), newest first
-  python3 scripts/memory.py add ENTRY.json  add one entry (refuses a key or a feature already used)
+  python3 scripts/memory.py add ENTRY.json  add one entry. Refuses: a used key, the same feature within 45 days,
+                                            the same pool as either of the last 2 posts, hojas-studio twice in 7 days
   python3 scripts/memory.py posted KEY      mark an entry as scheduled on Instagram
+  python3 scripts/memory.py drop KEY        remove an entry that never got scheduled
 
 ENTRY.json:
   {"key": "claude-connectors-gmail", "date": "YYYY-MM-DD", "pool": "claude",
@@ -18,6 +20,12 @@ PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "t
 POOLS = {"claude", "claude-code", "chatgpt", "gemini", "connectors", "skills", "plugins", "prompts",
          "workflow", "compare", "hojas-studio", "other"}
 KEY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+
+def norm(feature):
+    """'Connectors', 'connector', 'MCP connectors ' -> comparable form."""
+    words = re.sub(r"[^a-z0-9]+", " ", feature.lower()).split()
+    return "-".join(w[:-1] if len(w) > 3 and w.endswith("s") else w for w in words)
 
 
 def load():
@@ -53,13 +61,26 @@ def main():
         date.fromisoformat(it["date"])
         if any(x["key"] == it["key"] for x in items):
             sys.exit(f"DUPLICATE key {it['key']}: pick another topic")
-        same = [x for x in items if x["feature"] == it["feature"] and x["pool"] == it["pool"]]
-        if same and (date.fromisoformat(it["date"]) - date.fromisoformat(same[0]["date"])).days < 30:
+        today = date.fromisoformat(it["date"])
+        same = [x for x in items if norm(x["feature"]) == norm(it["feature"])]
+        if same and (today - date.fromisoformat(same[0]["date"])).days < 45:
             sys.exit(f"DUPLICATE feature {it['feature']} was posted {same[0]['date']}: pick another topic")
+        last2 = [x["pool"] for x in items[:2]]
+        if it["pool"] in last2 and it["pool"] != "other":
+            sys.exit(f"SAME POOL {it['pool']} as one of the last 2 posts {last2}: pick another pool")
+        hs = [x for x in items if x["pool"] == "hojas-studio"]
+        if it["pool"] == "hojas-studio" and hs and (today - date.fromisoformat(hs[0]["date"])).days < 7:
+            sys.exit(f"TOO SOON hojas-studio was posted {hs[0]['date']}: max once every 7 days")
         it.setdefault("posted", False)
         items.append(it)
         save(items)
         print(f"added {it['key']}")
+    elif cmd == "drop":
+        keep = [x for x in items if not (x["key"] == sys.argv[2] and not x.get("posted"))]
+        if len(keep) == len(items):
+            sys.exit(f"ERROR no unposted entry {sys.argv[2]}")
+        save(keep)
+        print(f"dropped {sys.argv[2]}")
     elif cmd == "posted":
         for it in items:
             if it["key"] == sys.argv[2]:

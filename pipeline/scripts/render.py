@@ -24,6 +24,8 @@ ALIAS = {
     "huggingface": "hugging-face", "xai": "x", "twitter": "x", "whatsapp": "whatsapp",
     "apple-calendar": "date", "calendar-date": "date", "reminders": "reminders", "apple": "si:apple", "sheets": "si:googlesheets",
     "google-sheets": "si:googlesheets", "docs": "si:googledocs", "google-docs": "si:googledocs",
+    "slides": "si:googleslides", "google-slides": "si:googleslides", "edge": "microsoft-edge", "vscode": "visual-studio-code",
+    "meet": "google-meet", "maps": "google-maps", "linkedin": "linkedin", "discord": "discord", "facebook": "facebook",
     "canva": "si:canva", "metricool": "text:M", "windsurf": "si:windsurf", "suno": "si:suno",
     "runway": "si:runway", "excel": "si:microsoftexcel", "word": "si:microsoftword",
     "powerpoint": "si:microsoftpowerpoint", "outlook": "si:microsoftoutlook", "teams": "si:microsoftteams",
@@ -127,7 +129,7 @@ LATIN = re.compile(r"([A-Za-z@#][A-Za-z0-9@#_.+/&'’:\-]*(?:\s+[A-Za-z0-9@#][A-
 def t(s):
     """Escape, keep Latin runs isolated for clean bidi, \n -> <br>, [[x]] -> highlighted."""
     s = html.escape(str(s or ""))
-    s = LATIN.sub(lambda m: f"<bdi>{m.group(1)}</bdi>", s)
+    s = LATIN.sub(lambda m: f"<bdi{' class=nw' if len(m.group(1)) <= 30 else ''}>{m.group(1)}</bdi>", s)
     s = re.sub(r"\[\[(.+?)\]\]", r'<span class="hl">\1</span>', s)
     return s.replace("\n", "<br>")
 
@@ -166,10 +168,11 @@ def card(c):
                         f'<span class="ml">{t(it.get("label"))}</span><span class="pill">{t(it.get("action", "Connect"))}</span></div>')
         body = "".join(rows)
     elif k == "button":
-        ring = " on" if hi is not None else ""
+        av_on = " on" if c.get("avatar_highlight") else ""
+        btn_on = " on" if (hi is not None and not av_on) else ""
         icon = f'<span class="bi">{ui(c.get("icon", "plus"))}</span>' if c.get("icon") != "" else ""
-        av = f'<span class="avatar{ring if c.get("avatar_highlight") else ""}">{t(c.get("avatar"))}</span>' if c.get("avatar") else ""
-        body = f'<div class="btnrow">{av}<span class="btn{ring if not c.get("avatar_highlight") else ""}">{icon}{t(c.get("label"))}</span></div>'
+        av = f'<span class="avatar{av_on}">{t(c.get("avatar"))}</span>' if c.get("avatar") else ""
+        body = f'<div class="btnrow">{av}<span class="btn{btn_on}">{icon}{t(c.get("label"))}</span></div>'
     elif k == "input":
         typed = c.get("text")
         txt = f'<div class="in-t">{t(typed)}</div>' if typed else f'<div class="in-p">{t(c.get("placeholder", "How can I help you today?"))}</div>'
@@ -224,7 +227,8 @@ def s_steps(s):
         out.append(f'<div class="step"><div class="sn">{n}</div>{card(st.get("card", {}))}'
                    f'<div class="cap fit">{t(st.get("caption", ""))}</div></div>')
     head = f'<h2 class="head c fit">{t(s["title"])}</h2>' if s.get("title") else ""
-    return f'<div class="main center">{head}<div class="steps">{"".join(out)}</div></div>'
+    lg = f'<div class="logos">{logos_html(s.get("logos"), "sm")}</div>' if s.get("logos") else ""
+    return f'<div class="main center">{lg}{head}<div class="steps">{"".join(out)}</div></div>'
 
 
 def s_text(s):
@@ -318,7 +322,7 @@ body{{direction:rtl;font-family:Doran,QNum,sans-serif;-webkit-font-smoothing:ant
 .remt{{flex-direction:column;gap:12%;align-items:stretch;padding:0 17%}}
 .remt div{{display:flex;align-items:center;gap:12%}} .remt i{{width:17%;aspect-ratio:1;border-radius:50%;border:3px solid currentColor;flex:none}}
 .remt b{{flex:1;height:2px;background:#cfcfd4}}
-bdi{{unicode-bidi:isolate}}
+bdi{{unicode-bidi:isolate}} bdi.nw{{white-space:nowrap}}
 .slide{{width:{W}px;height:{H}px;padding:96px 132px 0;display:flex;flex-direction:column;position:relative}}
 .main{{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:120px}}
 .center{{align-items:center;text-align:center}}
@@ -439,7 +443,8 @@ async () => {
     [...document.querySelectorAll('.fit')].every(e => e.scrollWidth <= e.clientWidth + 2);
   let s = 1;
   while (!fits() && s > 0.8) { s = +(s - 0.02).toFixed(2); document.documentElement.style.setProperty('--s', s); }
-  return {s, ok: fits(), h: sl.scrollHeight};
+  const font = [...document.fonts].some(f => f.family.replace(/"/g, '') === 'Doran' && f.status === 'loaded');
+  return {s, ok: fits(), h: sl.scrollHeight, font};
 }
 """
 
@@ -451,6 +456,8 @@ def page(body, handle):
 
 def main(data_path, out_dir):
     from playwright.sync_api import sync_playwright
+    if not FONT.exists():
+        sys.exit(f"ERROR: {FONT} missing, run scripts/setup.sh first")
     D = json.loads(pathlib.Path(data_path).read_text(encoding="utf-8"))
     handle = D.get("handle", "@qaf_of")
     out = pathlib.Path(out_dir).resolve()
@@ -473,6 +480,8 @@ def main(data_path, out_dir):
             pg.goto(f.as_uri())
             r = pg.evaluate(FIT_JS)
             pg.wait_for_timeout(150)
+            if not r["font"]:
+                sys.exit(f"ERROR slide {k}: the Doran font did not load, slides would use a fallback font")
             if not r["ok"]:
                 bad += 1
                 print(f"OVERFLOW slide {k}: content {r['h']}px even at 80% text, shorten it")
@@ -480,6 +489,7 @@ def main(data_path, out_dir):
                 print(f"slide {k}: text scaled to {int(r['s'] * 100)}%")
             pg.screenshot(path=str(out / f"slide_{k:02d}.png"))
             pg.screenshot(path=str(out / f"slide_{k:02d}.jpg"), type="jpeg", quality=88)
+            f.unlink()
         br.close()
     for m in sorted(set(MISSING)):
         print(f"MISSING-LOGO {m}: used a letter tile (try another name, see SPEC.md)")

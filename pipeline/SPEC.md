@@ -14,7 +14,7 @@
 |---|---|---|
 | `cover` | `title` (سطرين بالكثير، استخدم `\n`)، `sub`، `logos` | أول شريحة في الحيلة |
 | `rows` | `title` اختياري، `rows: [{label, sub?, logos}]` (2 إلى 4) | قائمة أشياء مع شعاراتها، نفس شكل المرجع |
-| `steps` | `title` اختياري، `steps: [{card, caption}]` (خطوتين بالكثير) | خطوات داخل تطبيق |
+| `steps` | `title` اختياري، `logos` اختياري، `steps: [{n, card, caption}]` (خطوتين بالكثير؛ `n` رقم الخطوة، الشريحة الثانية تبدأ من 3) | خطوات داخل تطبيق |
 | `text` | `title`، `body`، `points` (3 بالكثير)، `note`، `logos` | شرح فكرة |
 | `prompt` | `title`، `prompt`، `caption`، `model` اختياري | برومت جاهز للنسخ |
 | `compare` | `title`، `cols: [{logos:[x], name, points:[3]}]` (عمودين)، `verdict` | مقارنة أداتين |
@@ -28,13 +28,14 @@
 
 ## البطاقات (card) داخل `steps`
 كل بطاقة تشبه جزء من واجهة التطبيق. اكتب أسماء الأزرار والقوائم **حرفيًا مثل التطبيق** (بالإنجليزي لو واجهته إنجليزي). `highlight` يحدد العنصر اللي عليه إطار.
+أي بطاقة تقبل `title`: سطر رمادي صغير فوقها (مثل اسم الصفحة أو المتجر).
 
 | type | الحقول |
 |---|---|
 | `menu` | `items: [{icon, label}]`، `highlight: رقم` |
 | `toggle` | `items: [{icon, label, on}]`، `highlight` |
 | `connect` | `items: [{logo, label, action}]`، `highlight` |
-| `button` | `label`، `icon`، `avatar` (حرفين)، `avatar_highlight: true`، `skeleton: [70,52]` أسطر ضبابية فوقه |
+| `button` | `label`، `icon`، `highlight: 0` (إطار على الزر)، `avatar` (حرفين)، `avatar_highlight: true` (إطار على الدائرة بدل الزر)، `skeleton: [70,52]` أسطر ضبابية فوقه |
 | `input` | `text` أو `placeholder`، `model`، `highlight: "plus"` |
 | `code` | `text` (أمر أو كود قصير) |
 | `chips` | `items: [نصوص]`، `highlight` |
@@ -46,6 +47,7 @@
 
 ## أسماء الشعارات (`logos`)
 تنكتب صغيرة. أمثلة جاهزة:
-claude, anthropic, chatgpt (= openai), gemini, google, gmail, calendar (تقويم جوجل), apple-calendar (مربع تاريخ اليوم), reminders, drive, docs, sheets, notion, slack, github, figma, canva, n8n, zapier, cursor, perplexity, midjourney, meta, microsoft, nvidia, apple, deepseek, mistral, huggingface, grok, x, tiktok, instagram, whatsapp, youtube, telegram, vercel, supabase, lovable, replit, elevenlabs, qwen, excel, word, powerpoint, outlook, teams, amazon, aws, samsung, copilot.
+claude, anthropic, chatgpt (= openai), gemini, google, gmail, calendar (تقويم جوجل), apple-calendar (مربع تاريخ اليوم), reminders, drive, docs, sheets, slides (Google Slides), notion, slack, github, figma, canva, n8n, zapier, cursor, perplexity, midjourney, meta, microsoft, nvidia, apple, deepseek, mistral, huggingface, grok, x, tiktok, instagram, whatsapp, youtube, telegram, vercel, supabase, lovable, replit, elevenlabs, qwen, excel, word, powerpoint, outlook, teams, amazon, aws, samsung, copilot,
+chrome, safari, edge, firefox, linkedin, facebook, discord, meet, maps, vscode.
 خاصة: `hojas` (شعار HJS لهوجاس ستوديو)، `qaf` (شعار QAF)، `text:X` (مربع بحرف).
 أي اسم ثاني: جرّب اسم الشركة بالإنجليزي صغير بشرطات (مثل `hugging-face`)، وبعدها `si:<slug>` من simple-icons. لو ما فيه شعار، `text:` بأول حرف.

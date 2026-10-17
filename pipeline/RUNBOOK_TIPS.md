@@ -4,57 +4,69 @@
 الجمهور: ناس عاديين وأصحاب مشاريع في السعودية، مو مبرمجين. اللغة: عربي سعودي بسيط ومباشر، جمل قصيرة. بلا إيموجي، بلا شرطة طويلة (—)، بلا مبالغات تسويقية.
 ما فيه أحد يتابعك وقت التشغيل: لا تسأل، قرّر ونفّذ، واكتب التقرير بالآخر.
 
+## المسارات (مهم)
+كل أمر Bash يبدأ من جديد: المجلد والمتغيرات ما تنحفظ بين الأوامر. استخدم المسارات الكاملة دائمًا، وابدأ كل أمر بـ:
+```bash
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-tips"
+```
+- `$HOME/qaf-media` = نسخة المستودع العام rakaga66/test (الصور والأدوات). `$HOME/qaf-private` = المستودع الخاص (الخط).
+
 ## 0) التجهيز
 ```bash
-cd "$HOME/qaf-media/pipeline" && bash scripts/setup.sh      # يحتاج نسخة rakaga66/qaf-private في $HOME/qaf-private
-D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-tips"; mkdir -p "$OUT"
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-tips"
+bash "$P/scripts/setup.sh" && mkdir -p "$OUT"
 ```
-اقرأ `SPEC.md` كامل قبل ما تكتب أي شريحة.
+اقرأ `$P/SPEC.md` كامل قبل ما تكتب أي شريحة.
 
-## 1) الذاكرة (قبل الاختيار)
-`python3 scripts/memory.py seen 90` واقرأ كل اللي طلع.
+## 1) الذاكرة
+`python3 "$P/scripts/memory.py" seen 90` واقرأ كل اللي طلع.
 - ممنوع تعيد موضوع أو ميزة نزلت، ولو بصياغة ثانية.
-- لا تختار نفس `pool` حق آخر منشورين.
-- هوجاس ستوديو مرة كل 7 أيام بالكثير (السطر الأخير يقول متى آخر مرة).
+- لا تختار نفس `pool` حق آخر منشورين. هوجاس ستوديو مرة كل 7 أيام بالكثير. (السكربت يرفض هذي الحالات في الخطوة 2.)
 
-## 2) اختيار الموضوع
-المجالات (نوّع بينها):
-- `claude`: Projects، الذاكرة، Artifacts، البحث، صنع الملفات (Word و Excel و PowerPoint)، الصوت، Claude in Chrome، المهام المجدولة، أي ميزة جديدة.
+## 2) اختيار الموضوع وحجزه
+المجالات (`pool`):
+- `claude`: Projects، الذاكرة، Artifacts، البحث، صنع الملفات (Word و Excel و PowerPoint)، الصوت، Claude in Chrome، المهام المجدولة، الإضافات في تطبيقات ثانية، أي ميزة جديدة.
 - `claude-code`: وش هو وكيف يستفيد منه غير المبرمج، أوامر مفيدة.
 - `skills` و `connectors` و `plugins`: وش هي وكيف تفعلها ووش تستفيد منها بأمثلة حقيقية.
 - `chatgpt` و `gemini`: ميزات مفيدة (صور، بحث عميق، وكيل، صوت، GPTs، NotebookLM، Gemini في Gmail...).
 - `prompts`: برومت واحد جاهز للنسخ لشغلة محددة (مشروع، دراسة، محتوى، شغل).
 - `workflow`: كيف تسوي شي كامل بالذكاء الاصطناعي خطوة بخطوة (صفحة هبوط، إعلان، تلخيص PDF، خطة أسبوع).
 - `compare`: أي أداة لأي شغلة.
-- `hojas-studio`: سكل مونتاج راكان المجاني (هوجاس ستوديو). اقرأ قبلها README.ar.md من `https://raw.githubusercontent.com/rakaga66/hojas-studio/main/README.ar.md` ولا تكتب إلا اللي فيه. رابط التحميل اللي يُذكر: https://hojas-studio.netlify.app/ (مو رابط GitHub).
+- `hojas-studio`: سكل مونتاج راكان المجاني (هوجاس ستوديو). اقرأ قبلها `https://raw.githubusercontent.com/rakaga66/hojas-studio/main/README.ar.md` ولا تكتب إلا اللي فيه. رابط التحميل اللي يُذكر: https://hojas-studio.netlify.app/ (مو رابط GitHub).
+- `other`: أي شي مفيد ما يدخل فوق.
 الأفضلية: شي جديد أو رائج هالأسبوع (ابحث)، أو شي يقدر الشخص يجربه في 5 دقايق ويحس بالفرق.
 
+بعد ما تختار، احجزه في الذاكرة **قبل** الشغل: اكتب `$OUT/entry.json` (الصيغة في رأس `$P/scripts/memory.py`؛ `feature` اسم الميزة بالإنجليزي بكلمة أو كلمتين) وشغّل `python3 "$P/scripts/memory.py" add "$OUT/entry.json"`. لو طلع `DUPLICATE` أو `SAME POOL` أو `TOO SOON`: اختر موضوع ثاني.
+
 ## 3) البحث والتحقق
-- ابحث بـWebSearch (standard، و extended للجديد)، واقرأ المصادر الرسمية بـWebFetch: support.claude.com، docs.claude.com، anthropic.com/news، help.openai.com، openai.com، support.google.com، blog.google.
+- ابحث بـWebSearch (standard، و extended للجديد)، واقرأ المصادر الرسمية بـWebFetch: support.claude.com، docs.claude.com، anthropic.com/news، claude.com، help.openai.com، openai.com، support.google.com، blog.google.
 - كل خطوة واسم قائمة وزر في الشرائح لازم يكون مؤكد من صفحة رسمية حديثة. لو ما تأكدت من المسار بالضبط: لا ترسم خطوات واجهة، اشرح الفكرة وأعطِ برومت بدالها.
-- لو الميزة لخطة مدفوعة بس أو لبلدان معينة، قلها بالشريحة.
+- أسماء القوائم والأزرار تكتبها بالإنجليزي حرفيًا مثل الواجهة الإنجليزية (Extensions، Settings، Connectors)، إلا لو المصدر الرسمي يعرض واجهة عربية.
+- لو الميزة لخطة مدفوعة بس أو لبلدان أو متصفحات معينة، قلها بالشريحة.
 - احفظ روابط المصادر.
 
 ## 4) كتابة `$OUT/post.json`
 الترتيب المقترح:
 1. `cover`: عنوان يشد (سطرين بالكثير) + `sub` بسطر الفايدة + شعارات الأدوات.
 2. وش هي وليش تهمك (`rows` أو `text`).
-3 إلى 5. الطريقة: `steps` (خطوتين بكل شريحة، بطاقة تشبه الواجهة + جملة تحتها)، أو `prompt`، أو `compare`.
+3 إلى 5. الطريقة: `steps` (خطوتين بكل شريحة، بطاقة تشبه الواجهة + جملة تحتها؛ الشريحة الثانية من الخطوات تبدأ بـ `n: 3`)، أو `prompt`، أو `compare`.
 6. مثال أو نصيحة أخيرة.
-7. `end`: مثل `{"type":"end","logos":["qaf"],"title":"احفظ المنشور\nوجرّبها اليوم","sub":"كل يوم حيلة جديدة الساعة 2 الظهر","cta":"تبي الذكاء يشتغل لمشروعك؟","cta_sub":"مواقع، أتمتة، وربط أنظمة. راسلني على الخاص"}`.
+7. `end`: `{"type":"end","logos":["qaf"],"title":"احفظ المنشور\nوجرّبها اليوم","sub":"كل يوم حيلة جديدة الساعة 2 الظهر","cta":"تبي الذكاء يشتغل لمشروعك؟","cta_sub":"مواقع، أتمتة، وربط أنظمة. راسلني على الخاص"}`.
 
 قواعد:
-- **أي أداة أو شركة تنذكر في شريحة، حط شعارها** في `logos` الشريحة (أو `logo` العنصر). أسماء الشعارات في SPEC.md.
-- اكتب اسم الأداة بالإنجليزي كما هو (Claude، ChatGPT، Connectors) وحط مسافة بعد واو العطف قبل الكلمة الإنجليزية (`و Drive`).
+- **الأداة أو الشركة الأساسية في كل شريحة لازم يطلع شعارها** (`logos` في أي شريحة، أو `logo` العنصر داخل البطاقة). بحد أقصى 4 شعارات بالشريحة. الأشياء الثانوية (مثل أسماء متصفحات في جملة) ما تحتاج شعار.
+- اكتب اسم الأداة بالإنجليزي كما هو (Claude، ChatGPT) وحط مسافة بعد واو العطف قبل الكلمة الإنجليزية (`و Drive`).
+- جملة تحت الخطوة فيها كلام إنجليزي كثير: خلها أقصر من 40 حرف، والأسماء الطويلة (مثل اسم متجر) حطها في `title` البطاقة.
 - شريحة وحدة = فكرة وحدة. لا تحشي.
 
 ## 5) الرسم والمراجعة
 ```bash
-python3 scripts/render.py "$OUT/post.json" "$OUT"
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-tips"
+python3 "$P/scripts/render.py" "$OUT/post.json" "$OUT"
 ```
-- `OVERFLOW` اختصر وأعد. `MISSING-LOGO` صلّح الاسم وأعد.
-- افتح **كل** الشرائح بأداة Read وتأكد: الحروف العربية متصلة وسليمة، ما فيه نص مقطوع أو متداخل، كل شعار صحيح وواضح، الشرائح مرتبة وتنفهم بدون الكابشن.
-- مراجعة مستقلة: شغّل وكيل فرعي (Agent، general-purpose) وأعطه نص post.json وروابط المصادر، واطلب منه: يفتح المصادر ويتحقق من كل معلومة وكل خطوة واسم زر، ويراجع الإملاء والوضوح، ويرجّع قائمة مشاكل فقط. صلّح كل مشكلة حقيقية وأعد الرسم.
+- `ERROR` عن الخط: شغّل setup.sh مرة ثانية. `OVERFLOW` اختصر وأعد. `MISSING-LOGO` صلّح الاسم وأعد.
+- افتح **كل** الشرائح (`$OUT/slide_NN.png`) بأداة Read وتأكد: الحروف العربية متصلة وسليمة، ما فيه نص مقطوع، ما فيه كلمة وحدة يتيمة بسطر، الكلمات الإنجليزية ما انقسمت، كل شعار صحيح وواضح، والشرائح تنفهم بدون الكابشن.
+- مراجعة مستقلة: شغّل وكيل فرعي (Agent، general-purpose) وأعطه نص post.json وروابط المصادر، واطلب منه: يفتح المصادر ويتحقق من كل معلومة وكل خطوة واسم زر، ويراجع الإملاء والوضوح، ويرجّع قائمة مشاكل فقط. لو أداة Agent مو موجودة: سوّها بنفسك، افتح كل مصدر بـWebFetch وطابق كل جملة فيها معلومة، واكتب في التقرير إنك راجعت بنفسك. صلّح كل مشكلة حقيقية وأعد الرسم.
 
 ## 6) الكابشن `$OUT/caption.txt`
 ```
@@ -74,23 +86,23 @@ python3 scripts/render.py "$OUT/post.json" "$OUT"
 ```
 
 ## 7) الاستضافة
-`bash scripts/host.sh "$OUT" "$D-tips"` لازم آخر سطر يكون `ALL 200`. لو الرفع انرفض أو فشل: لا تحاول بطريقة ثانية، لا تجدول، وقل في التقرير إن الصور جاهزة للرفع اليدوي.
+`bash "$HOME/qaf-media/pipeline/scripts/host.sh" "$OUT" "$D-tips"` (عرّف D و OUT بنفس الأمر). لازم آخر سطر يكون `ALL 200`. لو الرفع انرفض أو فشل: لا تحاول بطريقة ثانية، لا تجدول، شغّل `memory.py drop <key>`، وقل في التقرير إن الصور جاهزة للرفع اليدوي.
 
 ## 8) الجدولة في Metricool
 - `getBrandSettings`: الحساب qaf_of (blogId 7411778، المنطقة Asia/Riyadh).
 - `getScheduledPosts` لليوم: لو فيه منشور مجدول بين 13:30 و 14:30، لا تضيف ثاني.
 - الوقت: 14:00 اليوم. لو الساعة الحين بعد 13:40: بعد 20 دقيقة من الحين.
-- شروط النشر التلقائي (كلها): المراجع المستقل ما ترك مشكلة معلومة ما انحلت، ما فيه OVERFLOW، فتحت كل الشرائح وهي سليمة، `ALL 200`. كلها تمام: `autoPublish: true`. شرط ناقص: `autoPublish: false` (يجيه إشعار في تطبيق Metricool) واكتب أي شرط نقص.
+- شروط النشر التلقائي (كلها): المراجعة ما تركت مشكلة معلومة ما انحلت، ما فيه OVERFLOW، فتحت كل الشرائح وهي سليمة، `ALL 200`. كلها تمام: `autoPublish: true`. شرط ناقص: `autoPublish: false` (يجيه إشعار في تطبيق Metricool) واكتب أي شرط نقص.
 - `createScheduledPost`: `providers: [{"network":"instagram"}]`، `instagramData: {"type":"POST"}`، `media` الروابط بالترتيب، `text` الكابشن، `publicationDate: {"dateTime":"<D>T14:00:00","timezone":"Asia/Riyadh"}`.
 - تأكد بـ`getScheduledPosts` إنه انجدول، وخذ `plannerUrl`. لا تعدّل ولا تحذف منشورات ثانية.
+- لو الجدولة فشلت: `memory.py drop <key>` وقل السبب.
 
 ## 9) الذاكرة
-اكتب `$OUT/entry.json` (الصيغة في رأس `scripts/memory.py`)، وبعدها:
 ```bash
-python3 scripts/memory.py add "$OUT/entry.json" && python3 scripts/memory.py posted <key>
-cd "$HOME/qaf-media" && git add pipeline/data/tips.json && git commit -qm "Tips memory: $D" && git push -q origin main
+P="$HOME/qaf-media/pipeline"; D=$(TZ=Asia/Riyadh date +%F)
+python3 "$P/scripts/memory.py" posted <key>
+cd "$HOME/qaf-media" && git pull -q --rebase origin main && git add pipeline/data/tips.json && git commit -qm "Tips memory: $D" && git push -q origin main
 ```
-لو `DUPLICATE` طلع قبل الجدولة: ارجع للخطوة 2. (سجّل `add` قبل الجدولة عشان يكشف التكرار، و`posted` بعدها.)
 لو الدفع فشل: أرسل `tips.json` لراكان وقل إن الذاكرة ما انحفظت.
 
 ## 10) التقرير (آخر رسالة)
