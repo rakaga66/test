@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# One-time setup per session: decrypt the font, build the Arabic-form copy, install icons, check Chromium.
-# Needs QAF_FONT_KEY (it is in the scheduled task's prompt, never commit it).
+# One-time setup per session: fetch the licensed font from the private repo, build the
+# Arabic-form copy, install icons, check Chromium.
+# Needs a clone of rakaga66/qaf-private at $QAF_PRIVATE (default $HOME/qaf-private).
 set -e
 P="$(cd "$(dirname "$0")/.." && pwd)"
+PRIV="${QAF_PRIVATE:-$HOME/qaf-private}"
 cd "$P"
-[ -n "$QAF_FONT_KEY" ] || { echo "ERROR: QAF_FONT_KEY is not set"; exit 1; }
+mkdir -p fonts
 if [ ! -f fonts/doran-fanum-extrabold.ttf ]; then
-  openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in fonts/doran.enc \
-    -out fonts/doran-fanum-extrabold.ttf -pass "pass:$QAF_FONT_KEY"
+  [ -f "$PRIV/fonts/doran-fanum-extrabold.ttf" ] || { echo "ERROR: font missing, clone rakaga66/qaf-private to $PRIV first"; exit 1; }
+  cp "$PRIV/fonts/doran-fanum-extrabold.ttf" fonts/
 fi
 python3 -c "import fontTools" 2>/dev/null || pip install --break-system-packages -q fonttools
 [ -f fonts/doran-ar.ttf ] || python3 scripts/arabize_font.py

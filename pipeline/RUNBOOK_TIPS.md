@@ -6,7 +6,7 @@
 
 ## 0) التجهيز
 ```bash
-cd "$HOME/qaf-media/pipeline" && bash scripts/setup.sh      # QAF_FONT_KEY لازم يكون مصدّر
+cd "$HOME/qaf-media/pipeline" && bash scripts/setup.sh      # يحتاج نسخة rakaga66/qaf-private في $HOME/qaf-private
 D=$(TZ=Asia/Riyadh date +%F); OUT="$HOME/qaf-out/$D-tips"; mkdir -p "$OUT"
 ```
 اقرأ `SPEC.md` كامل قبل ما تكتب أي شريحة.
